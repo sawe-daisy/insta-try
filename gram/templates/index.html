@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    {% for post in post %}
+    {{post.name}}
+    <img src="{{post.image.url}}" class="img-responsive" alt="{{image.name}}" height="200px">
+    {% endfor %}
+</body>
+</html>
