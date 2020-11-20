@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'gram',
     'bootstrap4',
+    'cloudinary',
 ]
 
 MIDDLEWARE = [
@@ -120,5 +121,11 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
+
+cloudinary.config( 
+  cloud_name = "sawedee", 
+  api_key = "616212518566398", 
+  api_secret = "9vv5at5ybHBCEkz0HAcprG3WwAI" 
+)
 
 STATIC_URL = '/static/'
