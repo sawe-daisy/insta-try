@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'gram',
     'bootstrap4',
     'cloudinary',
+    'crispy_forms',
 ]
 
 MIDDLEWARE = [
@@ -132,3 +133,5 @@ cloudinary.config(
 )
 
 STATIC_URL = '/static/'
+
+CRISPY_TEMPLATE_PACK='bootstrap4'

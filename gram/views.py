@@ -17,7 +17,7 @@ def register(request):
         if form.is_valid():
             username=form.cleaned_data.get('username')
             messages.success(request, f'Successfully created Account for {username}!')
-            return redirect('gram-landing')
+        return redirect('gram-landing')
     else:
         form= RegistrationForm()
     return render(request, 'users/register.html', {"form":form})

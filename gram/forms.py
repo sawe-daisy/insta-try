@@ -5,11 +5,10 @@ from django.contrib.auth.forms import UserCreationForm
 class RegistrationForm(UserCreationForm):
     email=forms.EmailField()
     bio= forms.CharField(label='Tell us about yourself', max_length=50)
-    prof_pic=forms.ImageField(label='AVI')
+    # prof_pic=forms.ImageField(label='AVI')
     class Meta:
         model = User
-        fields = ['username', 'email','password1', 'password2', 'bio', 
-        'prof_pic']
+        fields = ['username', 'email','password1', 'password2', 'bio']
 
 class ImageUploadForm(forms.Form):
     image = forms.ImageField(label = "Image:")
