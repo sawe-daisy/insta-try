@@ -9,7 +9,7 @@ class Profile(models.Model):
     bio= models.CharField(max_length=100)
     username=models.CharField(max_length=20)
     email= models.EmailField()
-    prof_pic= CloudinaryField('image')
+    prof_pic= CloudinaryField('image', blank=True)
 
     def __str__(self):
         return self.username
