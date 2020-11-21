@@ -15,9 +15,10 @@ def register(request):
     if request.method=="POST":
         form=RegistrationForm(request.POST)
         if form.is_valid():
+            form.save()
             username=form.cleaned_data.get('username')
-            messages.success(request, f'Successfully created Account for {username}!')
-        return redirect('gram-landing')
+            messages.success(request, f'Successfully created Account!.You can now login as {username}!')
+        return redirect('login')
     else:
         form= RegistrationForm()
     return render(request, 'users/register.html', {"form":form})
