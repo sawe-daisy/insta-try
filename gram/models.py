@@ -5,9 +5,8 @@ from django.contrib.auth.models import User
 # Create your models here.
 
 class Profile(models.Model):
-    user=models.OneToOneField(User, blank=True, on_delete=models.CASCADE)
+    user=models.OneToOneField(User,on_delete=models.CASCADE)
     bio= models.CharField(max_length=100)
-    email= models.EmailField()
     prof_pic= CloudinaryField('image', blank=True)
 
     def __str__(self):
