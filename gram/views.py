@@ -3,7 +3,7 @@ from .models import Image, Profile
 from django.http import HttpRequest
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
-from .forms import RegistrationForm, ProfileForm,ProfileUpdateForm, UserUpdateForm
+from .forms import RegistrationForm, ProfileForm,ProfileUpdateForm, UserUpdateForm, ImageUploadForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import (
@@ -15,13 +15,6 @@ from django.views.generic import (
 )
 
 # Create your views here.
-def index(request):
-    context={
-        'post':Image.objects.all()
-    }
-
-    return render(request, 'index.html', context)
-
 def register(request):
     if request.method=="POST":
         form=RegistrationForm(request.POST)
@@ -67,30 +60,36 @@ def profile(request):
 
     return render(request, 'users/profile.html', context)
 
+def index(request):
+    context={
+        'posts':Image.objects.all()
+    }
 
+    return render(request, 'index.html', context)
 class PostListView(ListView):
     model = Image
-    template_name = 'index.html'  # <app>/<model>_<viewtype>.html
+    template_name = 'index.html'
     context_object_name = 'posts'
     ordering = ['-pub_date']
 
 
 class PostDetailView(DetailView):
     model = Image
+    template_name= 'posts/image_detail.html'
 
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Image
-    fields = ['title', 'content']
-
+    fields = ['image', 'caption', 'name']
+    template_name='posts/postForm.html'
     def form_valid(self, form):
-        form.instance.author = self.request.user
+        form.instance.author = self.request.user.profile
         return super().form_valid(form)
 
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Image
-    fields = ['title', 'content']
+    fields = ['image', 'caption']
 
     def form_valid(self, form):
         form.instance.author = self.request.user

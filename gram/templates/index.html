@@ -1,7 +1,16 @@
 {% extends "base.html" %}
-    {% block content %}
-    {% for post in post %}
-    {{post.name}}
-    <img src="{{post.image.url}}" class="img-responsive" alt="{{image.name}}" height="200px">
+{% block content %}
+    {% for post in posts %}
+        <article class="media content-section">
+          <img class="rounded-circle article-img" src="{{ post.author.prof_pic.url }}" height="300px">
+          <div class="media-body">
+            <div class="article-metadata">
+              <a class="mr-2" href="{% url 'profile' %}">{{ post.author }}</a>
+              <small class="text-muted">{{ post.pub_date|date:"F d, Y" }}</small>
+            </div>
+            <h2><a class="article-title" href="{% url 'post-detail' post.id %}">{{ post.author}}</a></h2>
+            <p class="article-content">{{ post.caption }}</p>
+          </div>
+        </article>
     {% endfor %}
-{% endblock %}
+{% endblock content %}

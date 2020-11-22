@@ -2,6 +2,7 @@ from django.db import models
 from cloudinary.models import CloudinaryField
 from django.contrib.auth.models import User
 from PIL import Image
+from django.urls import reverse 
 
 # Create your models here.
 
@@ -22,7 +23,11 @@ class Profile(models.Model):
         #     img.thumbnail(output_size)
         #     img.save(self.prof_pic.path)
 
+class Comments(models.Model):
+    comment = models.CharField(max_length = 500)
 
+    def __str__(self):
+        return self.comment
 class Image(models.Model):
     image= CloudinaryField('image')
     author= models.ForeignKey(Profile, on_delete=models.CASCADE)
@@ -32,3 +37,11 @@ class Image(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def get_absolute_url(self):
+        return reverse('post-detail', kwargs={'pk':self.pk})
+
+class Comment(models.Model):
+    user_id= models.ForeignKey(Profile, on_delete=models.CASCADE)
+    comment=models.CharField(max_length=200)
+    image_id=models.ForeignKey(Image,on_delete=models.CASCADE)
