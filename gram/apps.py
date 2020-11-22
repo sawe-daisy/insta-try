@@ -5,4 +5,4 @@ class GramConfig(AppConfig):
     name = 'gram'
 
     def ready(self):
-        import use
+        import gram.signals
