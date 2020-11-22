@@ -7,12 +7,11 @@ from django.contrib.auth.models import User
 class Profile(models.Model):
     user=models.OneToOneField(User, blank=True, on_delete=models.CASCADE)
     bio= models.CharField(max_length=100)
-    username=models.CharField(max_length=20)
     email= models.EmailField()
     prof_pic= CloudinaryField('image', blank=True)
 
     def __str__(self):
-        return self.username
+        return f'{self.user.username} Profile'
 
 class Image(models.Model):
     image= CloudinaryField('image')
