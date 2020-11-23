@@ -11,6 +11,7 @@
             <h2><a class="article-title" href="{% url 'post-detail' post.id %}">{{ post.author}}</a></h2>
             <p class="article-content">{{ post.caption }}</p>
           </div>
+          <a class="mr-2" href="{% url 'comment' post.id %}">Comment</a>
         </article>
     {% endfor %}
 {% endblock content %}

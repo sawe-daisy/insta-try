@@ -4,7 +4,7 @@ from django.http import HttpRequest
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from django.contrib.auth.models import User
-from .forms import RegistrationForm, ProfileForm,ProfileUpdateForm, UserUpdateForm, ImageUploadForm
+from .forms import RegistrationForm, ProfileForm,ProfileUpdateForm, UserUpdateForm, ImageUploadForm, CommentForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import (
@@ -64,6 +64,7 @@ def profile(request):
 def index(request):
     context={
         'posts':Image.objects.all(),
+        'comments': Comment.objects.filter(image_id).all()
     }
 
     return render(request, 'index.html', context)
@@ -74,15 +75,34 @@ class PostListView(ListView):
     ordering = ['-pub_date']
 
 class UserListView(ListView):
-    model=Image
+    model=Profile
     template_name='posts/view.html'
-    context_object_name= 'posts'
-    paginate_by=2 
+    context_object_name='posts'
 
     def get_queryset(self):
-        user = get_object_or_404(User, username=self.kwargs.get('username'))
-        return Post.objects.filter(author=user.profile).order_by('-date_posted')
+        return Profile.objects.all().exclude(user=self.request.user)
+        # user = get_object_or_404(User, username=self.kwargs.get('username'))
+        # return Image.objects.filter(author=user.profile).order_by('-date_posted')
 
+class ProfileDetailView(DeleteView):
+    model=Profile
+    template_name='main/profile.html'
+    context_object_name='posts'
+
+    def get_object(self, **kwargs):
+        pk=self.kwargs.get('pk')
+        avi=Profile.objects.get(pk=pk)
+        return avi
+    def get_context_data(self, **kwargs):
+        context=super().get_context_data(**kwargs)
+        avi=self.get_object()
+        myProf=Profile.objects.get(user=self.request.user)
+        if avi.user in myProf.following.all():
+            follow=True
+        else:
+            follow=False
+        context["follow"]=follow
+        return context
 
 class PostDetailView(DetailView):
     model = Image
@@ -132,6 +152,7 @@ def about(request):
 @login_required
 def comment(request,id):
     comments= Comment.objects.filter(image_id=id).all()
+    images=Image.objects.filter(id=id)
     current_user = request.user
     user_profile = Profile.objects.get(user = current_user)
     image = get_object_or_404(Image, id=id)
@@ -139,13 +160,13 @@ def comment(request,id):
         form = CommentForm(request.POST)
         if form.is_valid():
             comment = form.save(commit = False)
-            comment.postt = image
-            comment.userr = user_profile
+            comment.image_id = image
+            comment.user_id = user_profile
             comment.save()
-            return redirect('home')
+            return redirect('gram-landing')
     else:
         form = CommentForm()
-    return render(request,'comment.html',{"form":form})
+    return render(request,'posts/comment.html',{"form":form, "images":images, "comments":comments})
 @login_required
 def searchprofile(request): 
     if 'searchUser' in request.GET and request.GET['searchUser']:
@@ -160,3 +181,16 @@ def searchprofile(request):
     else:
         message = "You haven't searched for any image category"
     return render(request, 'results.html', {'message': message})
+@login_required
+def follow_unfollow(request, pk):
+    if request.method=='POST':
+        my_profile=Profile.objects.get(user=request.user)
+        pk= request.POST.get('profile_pk')
+        obj=Profile.objects.get(pk=pk)
+
+        if obj.user in my_profile.following.all():
+            my_profile.following.remove(obj.user)
+        else:
+            my_profile.following.add(obj.user)
+        return redirect(request.META.get('HTTP_REFERER'))
+    return redirect('profile-details')

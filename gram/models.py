@@ -10,6 +10,8 @@ class Profile(models.Model):
     user=models.OneToOneField(User,null=True, on_delete=models.CASCADE)
     bio= models.CharField(max_length=100)
     prof_pic= CloudinaryField('image')
+    following= models.ManyToManyField(User, related_name='follower', blank=True)
+    created=models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f'{self.user.username} Profile'
@@ -22,6 +24,12 @@ class Profile(models.Model):
     
     def delete_profile(self):
         self.delete()
+
+    def profiles_posts(self):
+        return self.image_set.all()
+
+    class Meta:
+        ordering=('-created',)
         
         # img=Image.open(self.prof_pic.path)
         # if img.height >300 or img.height > 300:
@@ -29,11 +37,7 @@ class Profile(models.Model):
         #     img.thumbnail(output_size)
         #     img.save(self.prof_pic.path)
 
-class Comments(models.Model):
-    comment = models.CharField(max_length = 500)
 
-    def __str__(self):
-        return self.comment
 class Image(models.Model):
     image= CloudinaryField('image')
     author= models.ForeignKey(Profile, on_delete=models.CASCADE)
