@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from .forms import RegistrationForm, ProfileForm,ProfileUpdateForm, UserUpdateForm, ImageUploadForm, CommentForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from itertools import chain
 from django.views.generic import (
     ListView,
     DetailView,
@@ -177,10 +178,10 @@ def searchprofile(request):
             'results': searchResults,
             'message': message
         }
-        return render(request, 'results.html', params)
+        return render(request, 'main/search.html', params)
     else:
-        message = "You haven't searched for any image category"
-    return render(request, 'results.html', {'message': message})
+        message = "You haven't searched"
+    return render(request, 'main/search.html', {'message': message})
 @login_required
 def follow_unfollow(request, pk):
     if request.method=='POST':
@@ -194,3 +195,21 @@ def follow_unfollow(request, pk):
             my_profile.following.add(obj.user)
         return redirect(request.META.get('HTTP_REFERER'))
     return redirect('profile-details')
+
+
+def posts_following(request):
+    profile= Profile.objects.get(user=request.user)
+    users=[user for user in profile.following.all()]
+    posts=[]
+    qs=None
+
+    for u in users:
+        p=Profile.objects.get(user=u)
+        p_posts=p.profiles_posts()
+        posts.append(p_posts)
+    
+    my_posts=profile.profiles_posts()
+    posts.append(my_posts)
+    if len(posts)>0:
+        qs= sorted(chain(*posts), reverse=True, key=lambda obj: obj.pub_date)
+    return render(request, 'main/main.html', {"posts":qs, "profile":profile})

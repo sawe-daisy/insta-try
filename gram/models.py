@@ -28,6 +28,10 @@ class Profile(models.Model):
     def profiles_posts(self):
         return self.image_set.all()
 
+    @classmethod
+    def search_profile(cls, name):
+        return cls.objects.filter(user__username__icontains=name).all()
+
     class Meta:
         ordering=('-created',)
         

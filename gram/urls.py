@@ -8,6 +8,8 @@ from .views import (PostListView, PostDetailView, follow_unfollow,
 
 urlpatterns = [
     path('', PostListView.as_view(), name='gram-landing'),
+    path('search/', views.searchprofile, name='search'),
+    path('following/',views.posts_following, name='posts-follow-view'),
     path('post/<int:pk>/', PostDetailView.as_view(), name='post-detail'),
     path('user/users/', UserListView.as_view(), name='user-posts'),
     path('post/new/', PostCreateView.as_view(), name='post-create'),
@@ -21,6 +23,7 @@ urlpatterns = [
     path('comment/<id>/', views.comment, name='comment'),
     path('<pk>/', ProfileDetailView.as_view(), name='profile-details'),
     path('follow/<pk>/',follow_unfollow, name='follow-unfollow'),
+    
 ]
 
 if settings.DEBUG:
