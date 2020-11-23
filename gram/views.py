@@ -1,8 +1,9 @@
-from django.shortcuts import render, redirect
-from .models import Image, Profile
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Image, Profile, Follow, Likes, Comment
 from django.http import HttpRequest
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
+from django.contrib.auth.models import User
 from .forms import RegistrationForm, ProfileForm,ProfileUpdateForm, UserUpdateForm, ImageUploadForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -62,7 +63,7 @@ def profile(request):
 
 def index(request):
     context={
-        'posts':Image.objects.all()
+        'posts':Image.objects.all(),
     }
 
     return render(request, 'index.html', context)
@@ -71,6 +72,16 @@ class PostListView(ListView):
     template_name = 'index.html'
     context_object_name = 'posts'
     ordering = ['-pub_date']
+
+class UserListView(ListView):
+    model=Image
+    template_name='posts/view.html'
+    context_object_name= 'posts'
+    paginate_by=2 
+
+    def get_queryset(self):
+        user = get_object_or_404(User, username=self.kwargs.get('username'))
+        return Post.objects.filter(author=user.profile).order_by('-date_posted')
 
 
 class PostDetailView(DetailView):
@@ -117,3 +128,35 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 def about(request):
     return render(request, 'about.html', {'title': 'About'})
+
+@login_required
+def comment(request,id):
+    comments= Comment.objects.filter(image_id=id).all()
+    current_user = request.user
+    user_profile = Profile.objects.get(user = current_user)
+    image = get_object_or_404(Image, id=id)
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit = False)
+            comment.postt = image
+            comment.userr = user_profile
+            comment.save()
+            return redirect('home')
+    else:
+        form = CommentForm()
+    return render(request,'comment.html',{"form":form})
+@login_required
+def searchprofile(request): 
+    if 'searchUser' in request.GET and request.GET['searchUser']:
+        name = request.GET.get("searchUser")
+        searchResults = Profile.search_profile(name)
+        message = f'name'
+        params = {
+            'results': searchResults,
+            'message': message
+        }
+        return render(request, 'results.html', params)
+    else:
+        message = "You haven't searched for any image category"
+    return render(request, 'results.html', {'message': message})
