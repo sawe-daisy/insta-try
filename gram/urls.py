@@ -21,6 +21,7 @@ urlpatterns = [
     path('profile/',views.profile, name='profile'),
     path('about/',views.about, name='about'),
     path('comment/<id>/', views.comment, name='comment'),
+    path('like/<int:pk>/', views.like_image, name='like_post'),
     path('<pk>/', ProfileDetailView.as_view(), name='profile-details'),
     path('follow/<pk>/',follow_unfollow, name='follow-unfollow'),
     

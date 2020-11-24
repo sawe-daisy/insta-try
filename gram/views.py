@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Image, Profile, Follow, Likes, Comment
-from django.http import HttpRequest
+from .models import Image, Profile, Follow, Comment
+from django.http import HttpRequest, HttpResponseRedirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -8,6 +8,7 @@ from .forms import RegistrationForm, ProfileForm,ProfileUpdateForm, UserUpdateFo
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from itertools import chain
+from django.urls import reverse
 from django.views.generic import (
     ListView,
     DetailView,
@@ -108,6 +109,13 @@ class ProfileDetailView(DeleteView):
 class PostDetailView(DetailView):
     model = Image
     template_name= 'posts/image_detail.html'
+
+    def get_context_data(self, *args, **kwargs):
+        context=super(PostDetailView, self).get_context_data(*args, **kwargs)
+        stuff=get_object_or_404(Image, id=self.kwargs['pk'])
+        total_likes=stuff.total_likes()
+        context["total_likes"]=total_likes
+        return context
 
 
 class PostCreateView(LoginRequiredMixin, CreateView):
@@ -213,3 +221,8 @@ def posts_following(request):
     if len(posts)>0:
         qs= sorted(chain(*posts), reverse=True, key=lambda obj: obj.pub_date)
     return render(request, 'main/main.html', {"posts":qs, "profile":profile})
+
+def like_image(request, pk):
+    post= get_object_or_404(Image, id=request.POST.get('post_id'))
+    post.likes.add(request.user)
+    return HttpResponseRedirect(reverse('post-detail', args=[str(pk)]))

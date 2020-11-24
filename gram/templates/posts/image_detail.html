@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
   <article class="media content-section">
-    <img class="rounded-circle article-img" src="{{ object.image.url }}" height="400px">
+    <img class="rounded-circle article-img" src="{{ object.image.url }}" height="400px" width="300px">
     <div class="media-body">
       <div class="article-metadata">
         <!-- <a class="mr-2" href="#">{{ object.author }}</a> -->
@@ -13,6 +13,11 @@
           </div>
         {% endif %}
       </div>
+      <form action="{% url 'like_post' object.pk %}" method="POST">
+        {% csrf_token %}
+        <button type="submit" name="post_id" value="{{object.id}}" class="btn-sm btn-info">Like</button>
+        <p>Likes: {{ total_likes }}</p>
+      </form>
       <h2 class="article-title">{{ object.caption }}</h2>
       <!-- <p class="article-content">{{ object. }}</p> -->
     </div>

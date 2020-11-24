@@ -1,7 +1,7 @@
 from django.db import models
 from cloudinary.models import CloudinaryField
 from django.contrib.auth.models import User
-from PIL import Image
+# from PIL import Image
 from django.urls import reverse 
 
 # Create your models here.
@@ -48,10 +48,14 @@ class Image(models.Model):
     name= models.CharField(max_length=30)
     caption= models.TextField()
     comments = models.CharField(max_length=30,blank=True)
+    likes=models.ManyToManyField(User, related_name='blog_posts')
     pub_date=models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.name
+
+    def total_likes(self):
+        return self.likes.count()
     
     def save_image(self):
         self.save()
@@ -73,13 +77,13 @@ class Comment(models.Model):
     def __str__(self):
         return f'{self.user_id} :{self.comment}'
 
-class Likes(models.Model):
-    user_id=models.ForeignKey(User,on_delete=models.CASCADE)
-    like=models.IntegerField(default=0)
-    image_id=models.ForeignKey(Image,on_delete=models.CASCADE)
+# class Likes(models.Model):
+#     user_id=models.ForeignKey(User,on_delete=models.CASCADE)
+#     like=models.IntegerField(default=0)
+#     image_id=models.ForeignKey(Image,on_delete=models.CASCADE)
 
-    def __str__(self):
-        return self.like
+#     def __str__(self):
+#         return self.like
 
 class Follow(models.Model):
     follower = models.ForeignKey(User, on_delete=models.CASCADE, related_name='following')
