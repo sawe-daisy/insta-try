@@ -3,7 +3,7 @@
 #### Author: [Sawe daisy](https://github.com/sawe-daisy)
 
 
-* Link to live site: [instatry]()
+* Link to live site: [instatry](https://graminsta254.herokuapp.com/)
 
 ## Description
 The application allows users to sign up, upload pictures,view other user's pictures,like them, comment on them and also follow the other users.
